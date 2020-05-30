@@ -135,4 +135,36 @@ class MovieController extends Controller
         }
         return "no url provided";
     }
+
+    public function episodeList(Request $request){
+        $client = new Client(HttpClient::create(array(
+            'headers' => array(
+                'user-agent' => 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0', // will be forced using 'Symfony BrowserKit' in executing
+                'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                'Accept-Language' => 'en-US,en;q=0.5',
+                'Referer' => 'http://gogoanime.io/',
+                'Upgrade-Insecure-Requests' => '1',
+                'Save-Data' => 'on',
+                'Pragma' => 'no-cache',
+                'Cache-Control' => 'no-cache',
+            ),
+        )));
+
+        $totalEpisode = 0;
+        $url = str_replace("\\","",$request->episode);
+        $crawler = $client->request('GET', $url);
+        $crawler->filter('#episode_page > li > a')->last()->each(function ($node) use (&$totalEpisode){
+            $totalEpisode = $node->attr('ep_end');
+        });
+
+        $episodeList = [];
+        preg_match("/http(?:.*)episode-/",$url,$matches);
+        $tempLink = $matches[0];
+        for($i=1; $i<=$totalEpisode; $i++)
+            $episodeList[] = $tempLink.$i;
+        return response()->json([
+            'totalEpisode' => $totalEpisode,
+            'episode_list' => $episodeList
+        ],200);
+    }
 }
