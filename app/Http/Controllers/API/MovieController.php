@@ -120,6 +120,7 @@ class MovieController extends Controller
     }
 
     public function episodeList(Request $request){
+
         $client = new Client(HttpClient::create(array(
             'headers' => array(
                 'user-agent' => 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0', // will be forced using 'Symfony BrowserKit' in executing
@@ -141,10 +142,17 @@ class MovieController extends Controller
         });
 
         $episodeList = [];
+        //preg_match("/http(?:.*)episode-/",$url,$matches);
         preg_match("/http(?:.*)episode-/",$url,$matches);
+
         $tempLink = $matches[0];
         for($i=1; $i<=$totalEpisode; $i++)
             $episodeList[] = $tempLink.$i;
+
+        //todo
+        //https://www19.gogoanime.io/episodeNameHere-episode-2
+        //https://www19.gogoanime.io/category/episodeNameHere
+        // must work for both type of link using single function
 
         return response()->json([
             'totalEpisode' => $totalEpisode,
