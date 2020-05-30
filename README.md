@@ -12,9 +12,9 @@ response = latest anime episodes with title, image, episode link
 /api/episodeList
 method type = GET
 param = episode
-response = totalEpisode , episode_list 
+response = totalEpisode , episode_list
 
-<b>Get direct m3u8 by passing episode link<b>
+<b>Get direct m3u8 by passing episode link</b>
 /api/movieLink
 Type = GET 
 param = episode
