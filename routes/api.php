@@ -18,4 +18,5 @@ use Illuminate\Http\Request;
     return $request->user();
 });*/
 
-Route::get('movie', [MovieController::class, 'index'])->name('movie');
+Route::get('/movieList', [MovieController::class, 'index'])->name('movieList');
+Route::get('/movieLink', [MovieController::class, 'getm3u8ByLink'])->name('movieLink');
