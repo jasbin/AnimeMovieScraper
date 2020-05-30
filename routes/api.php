@@ -21,3 +21,4 @@ use Illuminate\Http\Request;
 Route::get('/movieList', [MovieController::class, 'index'])->name('movieList');
 Route::get('/movieLink', [MovieController::class, 'getm3u8ByLink'])->name('movieLink');
 Route::get('/episodeList', [MovieController::class, 'episodeList'])->name('episodeList');
+Route::get('/search', [MovieController::class, 'search'])->name('search');

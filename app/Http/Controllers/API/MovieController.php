@@ -37,26 +37,9 @@ class MovieController extends Controller
             $link = ['link'=>'http://gogoanime.io'.$node->filter('a')->attr('href')];
             $title = ['title' => $node->filter('a')->attr('title')];
             $image = ['image' => $node->filter('img')->attr('src')];
-            // $m3u8 = generateLiveLink('http://gogoanime.io'.$node->filter('a')->attr('href'));
-            // $m3u8Link = ['m3u8Link' => $m3u8 ];
             //add all array to animeList array
             $animeList[] = [$title,$link,$image];
-        }
-    );
-
-    //loop through all anime details
-    // foreach($animeList as $key => $value){
-    //     foreach($value as $k=>$val)
-    //         {
-    //             foreach($val as $v)
-    //                 print_r($v);
-    //             print_r("</br>");
-    //         }
-    //     print_r('-----------------------------------------'."</br>");
-    // }
-
-        // $m3u8Link = $this->generateLiveLink("https://www19.gogoanime.io/onikirimaru-episode-4");
-        // print 'm3u8 link: '.$m3u8Link;
+        });
 
         return response()->json([
             'animeList' => $animeList
@@ -162,9 +145,36 @@ class MovieController extends Controller
         $tempLink = $matches[0];
         for($i=1; $i<=$totalEpisode; $i++)
             $episodeList[] = $tempLink.$i;
+
         return response()->json([
             'totalEpisode' => $totalEpisode,
             'episode_list' => $episodeList
         ],200);
+    }
+
+    public function search(Request $request){
+        $client = new Client(HttpClient::create(array(
+                'headers' => array(
+                    'user-agent' => 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0', // will be forced using 'Symfony BrowserKit' in executing
+                    'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                    'Accept-Language' => 'en-US,en;q=0.5',
+                    'Referer' => 'http://gogoanime.io/',
+                    'Upgrade-Insecure-Requests' => '1',
+                    'Save-Data' => 'on',
+                    'Pragma' => 'no-cache',
+                    'Cache-Control' => 'no-cache',
+                    ),
+        )));
+
+        $animeList = [];
+        $crawler = $client->request('GET', 'https://www19.gogoanime.io//search.html?keyword='.$request->keyword);
+                $crawler->filter('.last_episodes > ul > li')->each(function ($node) use (&$animeList){
+                    $name = ['name' => $node->filter('.name')->text()];
+                    $link = ['link' => 'http://gogoanime.io/'.$node->filter('div>a')->attr('href')];
+                    $released = ['released' => $node->filter('.released')->text()];
+                    $animeList[] = [$name,$link,$released];
+                });
+
+        return response()->json($animeList);
     }
 }
